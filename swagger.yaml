@@ -1,0 +1,320 @@
+swagger: "2.0"
+info:
+  description: "This is a test documentation for the [following issue](https://github.com/swagger-api/swagger-editor/issues/664)"
+  version: "0.0.1"
+  title: "Books API documentaion"
+  contact:
+    email: "vlad.kolbaya@gmail.com"
+host: "v1adko.github.io"
+basePath: "/swagger-editor-html"
+tags:
+- name: "User"
+  description: "A registered user within the system, an admin"
+- name: "Book"
+  description: "A book entity that holds experiences and basic info"
+paths:
+  /users:
+    post:
+      tags:
+      - "User"
+      summary: "Create user"
+      description: "This can only be done by the logged in user."
+      operationId: "createUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User object"
+        required: true
+        schema:
+          $ref: "#/definitions/UserRequest"
+      responses:
+        default:
+          $ref: "#/definitions/User"
+
+    get:
+      tags:
+      - "User"
+      summary: "Load all users"
+      description: ""
+      operationId: "getUserByName"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Successful load"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+        401:
+          description: "Invalid access token"
+      security:
+      - access_token:admin: []
+
+  /users/login:
+    post:
+      tags:
+      - "User"
+      summary: "Returns user info and access token to authenticate in the system"
+      description: ""
+      operationId: "loginUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User object"
+        required: true
+        schema:
+          $ref: "#/definitions/UserRequest"
+      responses:
+        200:
+          $ref: "#/definitions/User"
+        401:
+          description: "Invalid username/password supplied"
+
+  /books:
+    post:
+      tags:
+      - "Book"
+      summary: "Add a new book"
+      description: ""
+      operationId: "addBook"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Book object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/BookRequest"
+      responses:
+        200:
+          description: "Book successfully created"
+          schema:
+            $ref: "#/definitions/BookRequest"
+      security:
+      - access_token:admin: []
+
+    get:
+      tags:
+      - "Book"
+      summary: "Load all books"
+      description: ""
+      operationId: "loadBooks"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "load_asset_paths"
+        in: "query"
+        description: "If true, will return all asset paths needed for book experiences"
+        type: "boolean"
+        default: "false"
+      responses:
+        200:
+          description: "All good"
+          schema:
+            type: "object"
+            properties:
+              books:
+                type: "array"
+                items:
+                  $ref: "#/definitions/Book"
+        405:
+          description: "Invalid input"
+
+
+  /books/{book_id}:
+    get:
+      tags:
+      - "Book"
+      summary: "Find book by ID"
+      description: "Returns a single book"
+      operationId: "getBookById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "book_id"
+        in: "path"
+        description: "ID of a book to get"
+        required: true
+        type: "string"
+      - name: "load_asset_paths"
+        in: "query"
+        description: "If true, will return all asset paths needed for book experiences"
+        type: "boolean"
+        default: "false"
+      responses:
+        200:
+          description: "Here's a book"
+          schema:
+            $ref: "#/definitions/Book"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Book not found"
+
+    put:
+      tags:
+      - "Book"
+      summary: "Update an existing book"
+      description: ""
+      operationId: "updateBook"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "book_id"
+        in: "path"
+        description: "ID of a book to update"
+        required: true
+        type: "string"
+
+      - in: "body"
+        name: "body"
+        description: "Book data that needs to be updated"
+        schema:
+          $ref: "#/definitions/Book"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Book not found"
+        405:
+          description: "Validation exception"
+      security:
+      - access_token:admin: []
+
+    delete:
+      tags:
+      - "Book"
+      summary: "Deletes a book"
+      description: ""
+      operationId: "deleteBook"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "book_id"
+        in: "path"
+        description: "ID of a book to delete"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Book successfully removed"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Book not found"
+      security:
+      - access_token:admin: []
+
+securityDefinitions:
+  access_token:admin :
+    description: "Admin access token"
+    type: "apiKey"
+    name: "access_token"
+    in: "header"
+  access_token:user:
+    description: "User access token"
+    type: "apiKey"
+    name: "access_token"
+    in: "header"
+
+definitions:
+
+  UserRequest:
+    type: "object"
+    required:
+      - "email"
+      - "password"
+    properties:
+      email:
+        type: "string"
+        description: "User's email"
+        example: "test@user.com"
+      password:
+        type: "string"
+        description: "User's password"
+        example: "justsomepassword"
+    xml:
+      name: "UserRequest"
+
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "User's unique identifier"
+        example: "aWma31as"
+      email:
+        type: "string"
+        description: "User's email"
+        example: "test@user.com"
+      role:
+        type: "string"
+        enum:
+          - "user"
+          - "admin"
+        default: "user"
+        example: "user"
+      access_token:
+        type: "string"
+        description: "User's JWT access token used for authenticating requests"
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6AkpXVCJ9.eyJ0eXBlIjoiYWRtaW4iLCJ1c2VyX2lkIjoiNndmdGQtaTVSIiwiY3JlYXRlZCI6MTUzMjk1Mjk2Njc4NiwianRpIjoiVVJ1bGVGYnN2IiwiaWF0IjoxNTMyOTUyOTY2LCJleHAiOjE1MzU1NDQ5NjYsImlzcyI6IlBob2VuaXggQ1JNIn0.PYq-rMFnRlIHBPJlxpw56O_y88MgtleLA2fTZ1axYRM"
+      created_at:
+        type: "string"
+        description: "ISO string date of document creation"
+        example: "2018-07-31T11:27:38.580Z"
+      updated_at:
+        type: "string"
+        description: "ISO string date of the last time document was updated"
+        example: "2018-07-31T11:27:38.580Z"
+    xml:
+      name: "User"
+
+  BookRequest:
+    title: "BookRequest"
+    type: "object"
+    required:
+      - "name"
+    properties:
+      name:
+        type: "string"
+        description: "Book's name"
+        example: "Harry Potter and the Philosopher's Stone"
+      image:
+        type: "string"
+        description: "Image URL"
+        example: "https://media.bloomsbury.com/rep/bj/9781408855652.jpeg"
+      author:
+        type: "string"
+        description: "Author's name"
+        example: "J. K. Rowling"
+
+  Book:
+    title: "Book"
+    type: "object"
+    allOf:
+      - $ref: '#/definitions/BookRequest'
+    properties:
+      id:
+        type: "string"
+        description: "User's unique identifier"
+        example: "aWma31as"
+      created_at:
+        type: "string"
+        description: "ISO string date of document creation"
+        example: "2018-07-31T11:27:38.580Z"
+      updated_at:
+        type: "string"
+        description: "ISO string date of the last time document was updated"
+        example: "2018-07-31T11:27:38.580Z"

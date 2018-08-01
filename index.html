@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Swagger Documentation</title>
+  <style>
+    html,
+    body,
+    #loader-container {
+      height: 99%;
+    }
+
+    #swagger-editor {
+      opacity: 1;
+    }
+
+    #loader-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #loader {
+      border: 16px solid #f3f3f3;
+      /* Light grey */
+      border-top: 16px solid #3498db;
+      /* Blue */
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+  <link rel="icon" type="image/png" href="https://editor.swagger.io/dist/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="https://editor.swagger.io/dist/favicon-16x16.png" sizes="16x16">
+  <link href="https://editor.swagger.io/dist/swagger-editor.css" rel="stylesheet">
+</head>
+
+<body>
+  <div id="loader-container">
+    <div id="loader"></div>
+  </div>
+  <div id="swagger-editor"></div>
+  <script src="https://editor.swagger.io/dist/swagger-editor-bundle.js"> </script>
+  <script>
+    window.onload = function () {
+      const setStyle = (selector, style, value) => {
+        // Taken from https://gist.github.com/tzi/2953155
+        const element = document.querySelector(selector);
+        const styleValue = `${style}:${value};`
+
+        if (!element) {
+          console.error('Could not find an element for', selector);
+          return;
+        }
+
+        if (document.all) {
+          element.style.setAttribute('cssText', styleValue);
+        } else {
+          element.setAttribute('style', styleValue);
+        }
+      };
+
+      window.editor = SwaggerEditorBundle({
+        dom_id: '#swagger-editor',
+        url: '/swagger.yaml' // Point to swagger YAML or JSON definiton
+      });
+
+      // Hide the spinner
+      setStyle('#loader-container', 'display', 'none');
+
+      // Hide the editor parts
+      setStyle('div.Pane.vertical.Pane1', 'display', 'none');
+      setStyle('div.Pane.vertical.Pane2', 'width', '100%');
+      setStyle('div.SplitPane.vertical', 'height', '100% !important');
+      setStyle('section.container', 'max-width', '100%');
+      setStyle('div.Pane2', 'overflow-y', 'auto');
+
+      // To avoid the flash of content
+      setTimeout(() => setStyle('#swagger-editor', 'opacity', 1), 100);
+    }
+  </script>
+</body>
+
+</html>
