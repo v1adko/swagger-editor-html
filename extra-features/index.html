@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Swagger Documentation</title>
+  <style>
+    html,
+    body {
+	    height: 99%;
+    }
+  </style>
+  <link rel="stylesheet" href="./loading-spinner.css" >
+  <link rel="icon" type="image/png" href="https://editor.swagger.io/dist/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="https://editor.swagger.io/dist/favicon-16x16.png" sizes="16x16">
+  <link rel="stylesheet" href="https://editor.swagger.io/dist/swagger-editor.css">
+</head>
+
+<body>
+  <div id="loader-container">
+    <div id="loader"></div>
+  </div>
+  <div id="swagger-editor"></div>
+  <script src="https://editor.swagger.io/dist/swagger-editor-bundle.js"> </script>
+  
+  <script src="./scripts/hide-editor.js"> </script>
+  
+  <script src="./scripts/persist-access-tokens.js"> </script>
+  
+  <script src="https://unpkg.com/yamljs@0.3.0/dist/yaml.min.js"> </script>
+  <script src="./scripts/load-config-through-console.js"> </script>
+  <script>
+    function makeCustomSwaggerEditor() {
+      window.editor = SwaggerEditorBundle({
+        url: 'https://raw.githubusercontent.com/v1adko/swagger-editor-html/open-api-3/open-api-3.yaml' // Point to swagger YAML or JSON definiton
+      });
+
+      // Normalizes styles, allows the original editor view by adding /editor to the route
+      hideExtraStyles();
+
+      // supports admin_access_token and user_access_token for the following schemas (OpenAPI 3 Format):
+      // securitySchemes:
+      //   access_token_admin:
+      //     description: Admin access token
+      //     type: apiKey
+      //     name: access_token
+      //     in: header
+      //   ...
+      loadAuthTokensFromStorage();
+
+      // Allows loading a different yaml config by setting editor.CONFIG_URL = "URL"
+      allowEditorConfigLoad();
+    }
+
+    window.onload = makeCustomSwaggerEditor;
+  </script>
+</body>
+
+</html>
